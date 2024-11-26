@@ -5,7 +5,6 @@
 namespace snnlib{
     struct LIFNeuron: public AbstractSNNNeuron
     {
-        std::vector<double> P;
         double V_rest() { return P[0]; }
         double V_th() { return P[1]; }
         double V_reset() { return P[2]; }
@@ -13,10 +12,11 @@ namespace snnlib{
         double R() { return P[4]; }
 
         LIFNeuron(int n_neurons, double V_rest = -65.0, double V_th = -50.0, double V_reset = -70.0, 
-            double tau_m = 20.0, double R = 1.0): AbstractSNNNeuron(n_neurons, 2), 
-            P{V_rest, V_th, V_reset, tau_m, R}{
+            double tau_m = 20.0, double R = 1.0): AbstractSNNNeuron(n_neurons, 2)
+        {
             neuron_dynamics_model = &LIFNeuron::neuron_dynamics;
             this->n_neurons = n_neurons;
+            P.assign({V_rest, V_th, V_reset, tau_m, R});
         }
         static std::vector<double> neuron_dynamics(double I, double* x, double t, double* P, double dt){
             double V = x[0];  // Membrane potential

@@ -24,12 +24,14 @@ namespace snnlib{
         std::vector<double> states_buffer;
 
 
-        std::vector<double> I(){
-            return std::vector<double>();
-        }
+        virtual std::vector<double> I() = 0;
         AbstractSNNSynapse(snnlib::AbstractSNNNeuron* presynapse_neurons, 
-            snnlib::AbstractSNNNeuron* postsynpase_neurons)
-        : presynapse_neurons(presynapse_neurons), postsynapse_neurons(postsynpase_neurons) {}
+            snnlib::AbstractSNNNeuron* postsynpase_neurons, int n_states_per_synapse)
+        : presynapse_neurons(presynapse_neurons), postsynapse_neurons(postsynpase_neurons) {
+            this->n_states_per_synapse = n_states_per_synapse;
+            states.assign(n_states_per_synapse * presynapse_neurons->n_neurons * postsynpase_neurons->n_neurons, 0);
+            states_buffer.assign(n_states_per_synapse * presynapse_neurons->n_neurons * postsynpase_neurons->n_neurons, 0);
+        }
         
         
         virtual ~AbstractSNNSynapse() {}
@@ -70,16 +72,24 @@ namespace snnlib{
             std::vector<double> x;
             
         public:
-            AbstractCurrentBaseSynpase(snnlib::AbstractSNNNeuron* presynapse_neurons, snnlib::AbstractSNNNeuron* postsynpase_neurons):
-                AbstractSNNSynapse(presynapse_neurons, postsynpase_neurons){}
+            AbstractCurrentBaseSynpase(snnlib::AbstractSNNNeuron* presynapse_neurons, snnlib::AbstractSNNNeuron* postsynpase_neurons, int n_states_per_synapse):
+                AbstractSNNSynapse(presynapse_neurons, postsynpase_neurons, n_states_per_synapse){}
             double* current(){
                 return &x[0];
             }
+            virtual std::vector<double> I() = 0;
     };
     struct ConvolutionCurrentBasedSynapse: public AbstractCurrentBaseSynpase
     {
+        SynapseKernel kernel;
         ConvolutionCurrentBasedSynapse(snnlib::AbstractSNNNeuron* presynapse_neurons, snnlib::AbstractSNNNeuron* postsynpase_neurons):
-            AbstractCurrentBaseSynpase(presynapse_neurons, postsynpase_neurons){}
+            AbstractCurrentBaseSynpase(presynapse_neurons, postsynpase_neurons, 2){
+                
+            }
+
+        std::vector<double> I(){
+            return std::vector<double>(states.begin(), states.begin() + n_presynapse_neurons() * n_postsynapse_neurons());
+        }
     };
     
     struct AbstractConductanceBaseSynpase: AbstractSNNSynapse
@@ -91,6 +101,7 @@ namespace snnlib{
             double* current(){
                 return &x[0];
             }
+            virtual std::vector<double> I() = 0;
             
     };
 }

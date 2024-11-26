@@ -96,7 +96,7 @@ namespace snnlib{
                         }
                     }
                 }
-                neuron_record_item.second->forward_states_to_buffer(input_current, 0, 0, 0);
+                neuron_record_item.second->forward_states_to_buffer(input_current, 0, &neuron_record_item.second->P[0], 0);
             }
             
             for(auto& connection_record_item: connections){

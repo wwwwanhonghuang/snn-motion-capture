@@ -14,6 +14,7 @@ namespace snnlib{
             network = new snnlib::SNNNetwork();
         }
         snnlib::SNNNetwork* build_network(){
+            network->initialization();
             return network;
         }
         int add_neuron(std::string neuron_name, snnlib::AbstractSNNNeuron* neuron){

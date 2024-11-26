@@ -8,6 +8,8 @@ namespace snnlib{
     {
         public:
             int n_neurons;
+            std::vector<double> P;
+
             NeuronDynamicsModel neuron_dynamics_model;
             void forward_states_to_buffer(const std::vector<double>& I, double t, double* P, double dt){
                 for(int i = 0; i < n_neurons; i++){
